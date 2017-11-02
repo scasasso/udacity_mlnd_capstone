@@ -1,0 +1,291 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Contract
+% LaTeX Template
+% Version 1.0 (December 8 2014)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Brandon Fryslie
+% With extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+% Note:
+% If you are using Apple OS X, go into structure.tex and uncomment the font
+% specifications for OS X and comment out the default specifications - this will
+% drastically increase how good the document looks. You will now need to
+% compile with XeLaTeX.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt]{article} % The default font size is 12pt on A4 paper, change to 'usletter' for US Letter paper and adjust margins in structure.tex
+
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\input{structure.tex} % Input the structure.tex file which specifies the document layout and style
+
+%----------------------------------------------------------------------------------------
+%	DYNAMIC CONTRACT INFORMATION
+%----------------------------------------------------------------------------------------
+
+% Your name and company name
+\newcommand{\YourName}{[Your name]}
+\newcommand{\CompanyName}{[Company name]}
+
+% Your address
+\newcommand{\AddressLineOne}{[Address]}
+\newcommand{\AddressLineTwo}{[Address]}
+
+% Your email address
+\newcommand{\YourEmail}{[Your email]}
+
+% The client's name
+\newcommand{\ClientName}{[Client name]}
+
+% The delivery date for specifications and completion date for the project
+\newcommand{\DeliveryDate}{[date]}
+\newcommand{\CompletionDate}{[date]}
+
+% The hourly rate
+\newcommand{\HourlyRate}{\$25}
+
+% Payee's information
+\newcommand{\PayeeName}{[Payee Name]}
+\newcommand{\PaymentAddressLineOne}{[Adress]}
+\newcommand{\PaymentAddressLineTwo}{[Adress]}
+\newcommand{\PaymentAddressLineThree}{[Adress]}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+
+\vspace*{\fill} % Add whitespace above to center the title page content
+
+\begin{center}
+
+{\LARGE A fake news detector}
+\vspace{1.5cm}
+
+{\large Proposal for the Capstone Project\\ Udacity Machine
+  Learning Engineer Nanodegree}\\ [1.5cm]
+
+Submitted: \today
+
+\end{center}
+
+Author: Stefano Casasso\\
+
+\vspace*{\fill} % Add whitespace below to center the title page content
+
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+%	DOMAIN BACKGROUND SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Domain background}
+As opposed to \textit{real news}, which is based on true facts 
+and has the goal of informing the audience, 
+\textit{fake news} can be defined as ``a made-up story with an
+intention to deceive'' \cite{NYT}. 
+Fake news is probably as old
+as real news, but it has become a major problem with the coming of the
+web which made it extremely easy and fast to circulate contents 
+among a potentially very large number of people. In particular, with
+the success of social networks in the last decade, fake news are
+spread around like a virus by people, usually with limited education and
+background, who share them in their public profiles. 
+  
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM STATEMENT SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Problem statement}
+\label{sec:problem}
+The problem under study in this project is to 
+discriminate between real news and fake news. \\
+The underlying idea is
+that this differentation is possible by systematically analyzing the
+content of the news, both in terms of text and headline. 
+The goal is to develop an algorithm that takes as input the content of
+the news and gives as output a label which can be ``real'' or
+``fake''. This is a \textit{binary classification problem} which will
+be studied using supervised machine learning techniques. 
+
+
+%----------------------------------------------------------------------------------------
+%	DATASETS AND INPUTS SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Datasets and inputs}
+In order to successfully apply supervised learning techniques, we
+need a sizeable ``labelled'' dataset, preferably with a good balance
+between the different classes in output (fake, real). \\
+In the following the strategy to gather these data is outlined. Since
+the data for the two classes come from different sources, they will be
+merged together using a common subset of the columns. However, as
+already mentioned previously, there is no plan (at this stage) to use
+any other information than the body and the headline. 
+
+\subsection*{Fake news dataset}
+This part, which is the most challenging, is fortunately already
+publicly available. The popular data science platform 
+\href{https://www.kaggle.com}{Kaggle} provides a dataset, in form of .csv
+file, which contains about 13000 fake news \cite{KaggleDataset}. \\
+This dataset is built by crawling the news from 244 websites which are
+tagged as not reliable sources by the
+\href{https://github.com/selfagency/bs-detector}{BS Detector}
+project. BS Detector ultimately uses a manually compiled list taken
+from the \href{http://www.opensources.co/}{OpenSources} platform. 
+As does Kaggle, we consider this an authority in the domain of fake
+news and we assume that these data are purely fake news. 
+
+The dataset consists of 20 columns, among which there are 
+of course \texttt{title}, \texttt{text}. 
+The use of additional variables is not planned and depends also on the
+availability of the same type of information also for the real news
+dataset. All the news in the dataset are collected in November 2016. 
+
+\subsection*{Real news dataset}
+For the ``real'' news, we use the freely downloadable dataset from 
+\href{https://webhose.io/datasets}{webhose.io}, under ``English news
+articles''. All the news come from November 2016, thus matching perfectly the time
+frame of the fake news data described above.  
+The dataset is huge and consists of about 500k news articles, in the
+(quite inconvenient) format of a single json file per news. 
+We apply an additional processing on top of these corpus, which
+consists of producing a single file and restricting the sources of news
+to the followings: \textit{New York Times}, \textit{Washington Post},
+\textit{The Washington Journal}, 
+\textit{Reuters}, \textit{The Guardian}, \textit{Forbes},
+\textit{BBC}, \textit{NPR} and \textit{Bloomberg}. 
+These websites are universally recognised as trustable sources of
+information and we are confident that they represent an unbiased
+sample of real news. \\
+As the number of news selected this way it's still much larger
+compared to the fake news dataset ($\sim$100k vs. $\sim$13k), we further skim
+the corpus by ``capping'' each source to a maximum of 3k articles, 
+chosen randomly. This procedure ensures that there is no source which
+dominates the others, thus making the dataset more balanced (we
+noticed that a sizeable fraction of news come from Reuters alone). 
+After this additional step we are left with about $\sim$24k articles.
+
+%----------------------------------------------------------------------------------------
+%	SOLUTION STATEMENT SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Solution statement}
+The solution to the problem described in \ref{sec:problem} consists of
+building a model which successfully identifies and labels fake news
+taking as input the news headline and body text. \\
+More details about the steps that have to be implemented to achieve
+this are given in \ref{sec:design}.
+
+%----------------------------------------------------------------------------------------
+%	BENCHMARK MODEL SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Benchmark model}
+As mentioned before, some implementations of a fake-news detector are
+already present in the web, see for instance \cite{Genes, NYDSA}. In
+these example, accuracy of at least 80\% are achieved on the test
+dataset. We aim at reproducing similar results. However, even though
+the fake news dataset is the same, the real news dataset is collected
+in a different way: for this reason the performance are not, strictly
+speaking, completely comparable. 
+
+
+%----------------------------------------------------------------------------------------
+%	EVALUATION METRICS SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Evaluation metrics}
+\label{sec:metrics}
+The size of the data is different among the two classes, as the real
+news are almost the double of the fake news. 
+For this kind of situation, the best metric is the 
+\href{https://en.wikipedia.org/wiki/F1_score}{F1 score} which is
+defined as the harmonic average of the \textit{precision} and the
+\textit{recall}. In this study the precision is defined as the number
+of fake news labelled as fake divided by the total number of news
+labelled as fake. The recall is defined as the number of fake news
+labelled as fake divided by the total number of fake news in the
+dataset. \\
+The F1 score will be used also for the optimization of the model
+hyperparameters of the model. 
+
+%----------------------------------------------------------------------------------------
+%	PROJECT DESIGN SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Project design}
+\label{sec:design}
+A tentaive ordered workflow is given below.
+\begin{enumerate}
+\item \textbf{Preparing the dataset}. As the data from the two
+  output classes come from different sources, they have to be merged
+  in the same structure. 
+\item \textbf{Converting text to features}. This part involves the
+  application of some \textit{Natural Language Processing} (NLP) techniques to
+  convert the body text to a vector of numerical features which can be
+  fed to a supervised learning model. The baseline approach that is
+  considered here is the so-called \textit{TF-IDF} \cite{TFIDF}, which
+  assigns a weight to each word in the document, for each document in
+  the corpus, according to the importance of the word in the
+  document. 
+\item \textbf{Choosing the model(s)}. Once each article has been
+  ``vectorized'' in a space of features, a machine learning algorithm
+  for classification can be chosen and trained on the data. 
+We plan to test more than one model and compare them using the
+specified metrics (more details below). Among the algorithm which have
+been successfully used \cite{Genes, NYDSA} there are: \textit{naive bayes}, \textit{logistic
+regression}, \textit{random forest} and and \textit{support vector
+machine}. 
+We plan to test at least 3 of them. 
+\item \textbf{Choosing appropriate performance metric}. More details
+  are given in \ref{sec:metrics}. 
+\item \textbf{Fine-tuning the hyper-parameters}. Having chosen the
+  model and the performance metrics, the search for the best model will
+  be carried out using the usual grid search across the
+  hyper-parameter space. 
+\item{\textbf{Summarize the results}. As a final step the results are
+    summarized, corresponding to the different techniques used and the
+    corresponding accuracy achieved. }
+\end{enumerate}
+The step as of 1 will be done within a script which will
+  be also included for reproducibility purpose. We plan to include all
+  the other steps in the same \textit{Jupyter Notebook}. 
+
+%----------------------------------------------------------------------------------------
+%	REFERENCES SECTION
+%----------------------------------------------------------------------------------------
+
+\nocite{*}
+\bibliographystyle{ieeetr}
+%\bibliographystyle{alphadin}
+\renewcommand{\refname}{References}
+\bibliography{references}
+
+%https://www.nytimes.com/2016/12/06/us/fake-news-partisan-republican-democrat.html
+
+
+\end{document}
