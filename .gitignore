@@ -1,3 +1,5 @@
 .ipynb*
 .idea
 data/*.csv
+*.png
+*__pycache__*
