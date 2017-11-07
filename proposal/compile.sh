@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 source=$1
 
 rm ${source}*out ${source}*aux ${source}*log ${source}*pdf ${source}*~ ${source}*bbl ${source}*blg
