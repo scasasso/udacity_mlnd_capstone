@@ -3,3 +3,9 @@
 data/*.csv
 *.png
 *__pycache__*
+*.log
+*.bbl
+*.blg
+*.aux
+*.out
+*/*.pdf
