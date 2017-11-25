@@ -25,8 +25,56 @@
 \documentclass[a4paper,12pt]{article} % The default font size is 12pt on A4 paper, change to 'usletter' for US Letter paper and adjust margins in structure.tex
 
 \usepackage{url}
+\usepackage{multirow}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{setspace}
+\definecolor{Code}{rgb}{0,0,0}
+\definecolor{Decorators}{rgb}{0.5,0.5,0.5}
+%\definecolor{Numbers}{rgb}{0.5,0,0}
+\definecolor{MatchingBrackets}{rgb}{0.25,0.5,0.5}
+\definecolor{Keywords}{rgb}{0,0,1}
+\definecolor{self}{rgb}{0,0,0}
+\definecolor{Strings}{rgb}{0,0.63,0}
+\definecolor{Comments}{rgb}{0,0.63,1}
+\definecolor{Backquotes}{rgb}{0,0,0}
+\definecolor{Classname}{rgb}{0,0,0}
+\definecolor{FunctionName}{rgb}{0,0,0}
+\definecolor{Operators}{rgb}{0,0,0}
+\definecolor{Background}{rgb}{0.98,0.98,0.98}
+\lstdefinelanguage{Python}{
+%numbers=left,
+%numberstyle=\footnotesize,
+%numbersep=1em,
+xleftmargin=1em,
+framextopmargin=2em,
+framexbottommargin=2em,
+showspaces=false,
+showtabs=false,
+showstringspaces=false,
+frame=l,
+tabsize=4,
+% Basic
+basicstyle=\ttfamily\small\setstretch{1},
+backgroundcolor=\color{Background},
+% Comments
+commentstyle=\color{Comments}\slshape,
+% Strings
+stringstyle=\color{Strings},
+morecomment=[s][\color{Strings}]{"""}{"""},
+morecomment=[s][\color{Strings}]{'''}{'''},
+% keywords
+morekeywords={import,from,class,def,for,while,if,is,in,elif,else,not,and,or,print,break,continue,return,True,False,None,access,as,,del,except,exec,finally,global,import,lambda,pass,print,raise,try,assert},
+keywordstyle={\color{Keywords}\bfseries},
+% additional keywords
+morekeywords={[2]@invariant,pylab,numpy,np,scipy},
+keywordstyle={[2]\color{Decorators}\slshape},
+emph={self},
+emphstyle={\color{self}\slshape},
+%
+}
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -120,10 +168,10 @@ spread around like a virus by people, usually with limited education and
 background, who share them in their public profiles.
 
 The aim of this project is to build an algorithm to detect and flag fake news,
-based only on the text of the news. This is a \textit{binary classification problem} which will
-be studied using supervised machine learning (ML) techniques.
-In order to successfully apply these techniques, we
-need a sizeable ``labelled'' dataset, preferably with a good balance
+based only on the text of the news. This is a \textit{binary classification problem} which
+is studied using supervised machine learning (ML) techniques.
+In order to successfully apply these techniques,
+a sizeable ``labelled'' dataset is needed, preferably with a good balance
 between the different classes in output (fake, real). \\
 A dataset for fake news is already
 publicly available on the popular data science platform
@@ -166,6 +214,7 @@ Evaluation of the performance on the test dataset.
 \end{itemize}
 
 \subsection{Metrics}
+\label{sec:metrics}
 The dataset is composed by approximately 1/3 fake news and 2/3 real news.
 In the presence of unbalanced class populations, simply looking at
 the \textit{accuracy} of the predictions is not sufficient, as it will be
@@ -279,8 +328,8 @@ the most frequent ones. These plots are generated using the \texttt{wordcloud} p
 \begin{figure}[h!]
 \caption{The number of characters in the article text (left) and title (right). \label{fig:text_title_length}}
 \begin{center}
-\includegraphics[width=0.47\textwidth]{plots/text_length} \hspace{0.2cm}
-\includegraphics[width=0.47\textwidth]{plots/title_length}
+\includegraphics[width=0.4\textwidth]{plots/text_length} \hspace{0.2cm}
+\includegraphics[width=0.4\textwidth]{plots/title_length}
 \end{center}
 \end{figure}
 
@@ -288,17 +337,17 @@ the most frequent ones. These plots are generated using the \texttt{wordcloud} p
 \caption{The number of participants in the thread (top left), replies to the thread (top right)
 and likes to the post (bottom). \label{fig:post_feedback}}
 \begin{center}
-\includegraphics[width=0.47\textwidth]{plots/participants_count} \hspace{0.2cm}
-\includegraphics[width=0.47\textwidth]{plots/replies_count} \\
-\includegraphics[width=0.47\textwidth]{plots/likes}
+\includegraphics[width=0.4\textwidth]{plots/participants_count} \hspace{0.2cm}
+\includegraphics[width=0.4\textwidth]{plots/replies_count} \\
+\includegraphics[width=0.4\textwidth]{plots/likes}
 \end{center}
 \end{figure}
 
 \begin{figure}[h!]
 \caption{Two examples of ``word cloud'' plots from a fake (left) and real (right) news. \label{fig:wcloud}}
 \begin{center}
-\includegraphics[width=0.47\textwidth]{plots/wcloud_fake} \hspace{0.2cm}
-\includegraphics[width=0.47\textwidth]{plots/wcloud_real}
+\includegraphics[width=0.4\textwidth]{plots/wcloud_fake} \hspace{0.2cm}
+\includegraphics[width=0.4\textwidth]{plots/wcloud_real}
 \end{center}
 \end{figure}
 
@@ -313,8 +362,9 @@ as most of the ML algorithms work only with numerical inputs.
 In this project we chose a popular technique called \textbf{Term Frequency-Inverse Document Frequency}
 or simply \textbf{TFIDF} \cite{TFIDF}.
 The TFIDF transformation allows not only to vectorize the text (i.e. the rows of the dataset)
-into numerical features but naturally filters the most frequent words in the corpus.\\
-The default \texttt{scikit-learn} implementation of TFIDF used in this prject defines:
+into numerical features but naturally filters the most frequent words in the corpus,
+as it is explained in the following. \\
+The default \texttt{scikit-learn} implementation of TFIDF used in this project defines:
 \begin{equation}
 TFIDF (t, d) = TF(t, d) \times IDF (t)
 \end{equation}
@@ -341,16 +391,16 @@ and training complexity.
 \item \textbf{Mulinomial Naive Bayes}. NB is frequently used in text classification,
 like spam detection, because, despite its simplicity and ``naive'' assumptions (independence of features),
 it proved to work still quite well in practice. It is also very fast to train.
-\item \textbf{Support Vector Machine}. SVM is one of the most popular ML algorithm and
-is known to perform well also on text classification tasks.
+\item \textbf{Logistic Regression Classifier}. Linear classifiers are usually a good compromise between
+complexity and training time and therefore are a good benchmark to compare against more complicated algorithms.
 \item \textbf{Random Forest}. Random forests are among the most powerful predictive
-models and have a wide range of applications. The RF can potentially capture
+models and have a wide range of applications. The RF can potentially captures
 more complex patterns in the dataset at the prize of a longer training and higher
 parameter tuning complexity.
 \end{itemize}
 The three classifiers are finally combined in a ``voting classifier'' \cite{scikit-ensemble}.
 The \textbf{ensemble classifier} usually gives better performances (smaller variance) compared to each single classifier in the
-ensemble, especially when there is little or none correlation across the different predictors
+ensemble when there is little or none correlation across the different predictors
 (different assumptions, different training set, etc.).
 
 \subsection{Benchmark}
@@ -405,11 +455,96 @@ see Sec. \ref{sec:explore} and \ref{sec:visuals}.
 
 \subsection{Implementation}
 \label{sec:implementation}
+The data is manipulated using \texttt{pandas} \cite{mckinney-proc-scipy-2010}.
+The implementation of ML models and metrics relies on the \texttt{scikit-learn} API \cite{scikit-learn}.
+
+Once the data is loaded, the first step is to divide it into \textit{training} and \textit{testing} datasets.
+The common choice of retaining 20\% of the data for testing is adopted. \\
+The article text is then transformed into numerical features according to the TFIDF procedure
+described in Sec. \ref{sec:algos}. The \texttt{sklearn.feature\_extraction.text.TfidfVectorizer} \cite{scikit-tfidf}
+class is used, with the following arguments:
+
+\begin{lstlisting}[language=Python]
+vectorizer = TfidfVectorizer(max_df=0.7,
+                             stop_words='english')
+\end{lstlisting}
+
+\texttt{max\_df} is the fraction of words in the dictionary which are used as features:
+in this implementation the 30\% most frequently used words will be discarded.
+The \texttt{stopwords} option select the English list of ``stop-words'' implemented in the package.
+
+Then the Multinomial Naive Bayes (MNB) classifier is defined \\
+(class \texttt{sklearn.naive\_bayes.MultinomialNB} \cite{scikit-mnb})
+using the default parameters and fitted to the training data.
+
+The Logistic Regression (LRE) classifier is defined using the class \\
+\texttt{sklearn.linear\_model.LogisticRegressionCV} \cite{scikit-lr}.
+All the parameters of the constructor are the default ones.
+
+For the implementation of the Random Forest (RFO) classifier the class\\
+\texttt{sklearn.ensemble.RandomForestClassifier} \cite{scikit-rndf} is used.
+Since there is a very large number of features and samples, the trees of the forest can
+potentially grow very complicated. Hence, a high level of regularization is needed.
+The first attempt of parameter set, which is tweaked afterwards using grid search, is as follows:
+\begin{lstlisting}[language=Python]
+clf_rndf = RandomForestClassifier(class_weight='balanced_subsample',
+                                  n_estimators=30,
+                                  max_depth=20,
+                                  min_samples_split=20,
+                                  max_features=0.01)
+\end{lstlisting}
+This choice is driven by the need to:
+\begin{itemize}
+    \item account for unbalance across classes (\texttt{class\_weight})
+    \item reduce the number of input features (\texttt{max\_features})
+    \item limit the size of the forest (\texttt{n\_estimators})
+    \item regularize the trees (\texttt{max\_depth}, \texttt{min\_samples\_split})
+\end{itemize}
+
+
+The metrics described in Sec. \ref{sec:metrics} are computed using the
+implementation in the \texttt{sklearn.metrics} module \cite{scikit-metrics}.
 
 
 \subsection{Refinement}
+\label{sec:refinement}
+This section describes how the models implemented as of Sec. \ref{sec:implementation} are
+fine-tuned and how the ensemble of classifier is defined.
 
+The tuning of the hyperparameters is done using the powerful\\
+\texttt{sklearn.model\_selection.GridSearchCV} class \cite{scikit-gridsearchcv}.
+The hyper-parameters in the grids and their best fit values are reported in Tab. \ref{tab:bestfit}.
 
+\begin{table}
+\begin{center}
+\begin{tabular}{ c | c | c }
+\textbf{Model} & \textbf{Parameter} & \textbf{Best fit value} \\ \hline
+\multirow{2}{*}{MNB} & \texttt{alpha} & 0.2 \\
+ & \texttt{fit\_prior} & False \\ \hline
+\multirow{4}{*}{LRE} & \texttt{C} & 20.4 \\
+ & \texttt{dual} & True\\
+ & \texttt{fit\_intercept} & True\\
+ & \texttt{penalty} & 'l2'\\ \hline
+\multirow{4}{*}{RFO} & \texttt{n\_estimators} & 100 \\
+ & \texttt{max\_features} & 0.02 \\
+ & \texttt{max\_depth} & 100 \\
+ & \texttt{min\_samples\_split} & 50 \\ \hline
+\end{tabular}
+\end{center}
+\caption{Best fit values of the floating parameters in the models.
+\label{tab:bestfit}}
+\end{table}
+
+Two approaches for the ensemble are considered:
+\begin{itemize}
+\item Ensemble 1 (EN1): ``hard'' voting, i.e. majority voting, including all the 3 classifiers.
+\item Ensemble 2 (EN2): ``soft'' voting, i.e. voting weighted by probabilities, including the LRE and RFO classifiers.
+In this case the MNB is excluded because the probabilities computed by naive bayes
+algorithms are known to be not trustable.
+\end{itemize}
+
+All the solutions and their performances are presented in Tab. \ref{tab:results}.
+Based on these results, the chosen final model is EN2.
 
 %----------------------------------------------------------------------------------------
 %	RESULTS SECTION
@@ -417,17 +552,58 @@ see Sec. \ref{sec:explore} and \ref{sec:visuals}.
 
 \section{Results}
 
-
 \subsection{Model Evaluation and Validation}
+All the results for intermediate and final solutions, based on the test set,
+are presented in Tab. \ref{tab:results}.
+It can be noticed that the optimisation improved largely the results
+of the MNB model and the RFO model.
+The LRE model instead is not improved significantly. \\
+The EN2 has slightly better perfomances, with F1-score of 92\% and
+it's chosen as the final model. \\
+Overall the performances are very good and satisfactory also
+compared to the benchmarks reported in Sec. \ref{sec:benchmark}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{ c | c | c | c | c }
+\textbf{Classifier} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 score} \\ \hline
+\multicolumn{5}{c}{\textbf{before optimisation}} \\ \hline
+MNB & 0.84 & 0.56 & 0.97 & 0.71 \\ \hline
+LRE & 0.94 & 0.93 & 0.91 & 0.92 \\ \hline
+RFO & 0.88 & 0.91 & 0.79 & 0.85 \\ \hline
+\multicolumn{5}{c}{\textbf{after optimisation}} \\ \hline
+MNB & 0.90 & 0.87 & 0.86 & 0.86 \\ \hline
+LRE & 0.94 & 0.93 & 0.91 & 0.92 \\ \hline
+RFO & 0.93 & 0.89 & 0.91 & 0.90 \\ \hline
+\multicolumn{5}{c}{\textbf{ensembles}} \\ \hline
+EN1 & 0.94 & 0.92 & 0.91 & 0.92 \\ \hline
+{\color{red} EN2} & {\color{red} 0.95} & {\color{red} 0.92} & {\color{red} 0.92} & {\color{red} 0.92} \\ \hline
+\end{tabular}
+\end{center}
+\caption{Performances of the 3 classifiers (before and after optimization)
+and the 2 ensemble classifiers (in red the final model).
+\label{tab:results}}
+\end{table}
+
+To further assess the validity of the model, an additional \textit{sensitivity test} is carried out:
+in each article of the dataset one sentence is removed, chosen randomly.
+The results prove to be stable against this check: in particular the F1-score
+is still 92\% even after this perturbation.
 
 
 \subsection{Justification}
+The final model is a soft-voting ensemble classifier which
+consists of a Logistic Regression model combined with a Random Forest model,
+both highly regularized.
+The final solution has an F1-score of 92\% on the test set,
+with perfectly balanced recall and sensitivity. These performances are
+in line with the ones reported in the benchmarks \cite{NYDSA, jarmul}.
 
+Despite the good results obtained with this dataset,
+we can't claim that the problem of fake news is solved by this algorithm.
+There are in fact limitations to its use that are further discussed
+in Sec. \ref{sec:improvement}.
 
-\subsection{Reflection}
-
-
-\subsection{Improvement}
 
 %----------------------------------------------------------------------------------------
 %	CONCLUSION SECTION
@@ -435,7 +611,88 @@ see Sec. \ref{sec:explore} and \ref{sec:visuals}.
 
 \section{Conclusion}
 
+\subsection{Free-form visualization}
+One of the most important characteristics of ML models is the number
+of samples needed for training.
+In fact, everytime the model has to be re-trained on new data, it's crucial to know
+the number of samples in the training set which is needed to achieve optimal perfomances.
+In Fig. \ref{fig:scores_vs_nsamples} several different scores are shown as a function
+of the number of samples included in the training dataset, namely accuracy, precision, recall and F1-score
+(see Sec. \ref{sec:metrics}).
+In this analysis the test set is the same for each training session.
+\begin{figure}[h!]
+\caption{Classification scores as a function of the number of training samples. \label{fig:scores_vs_nsamples}}
+\begin{center}
+\includegraphics[scale=0.8]{plots/scores_vs_nsamples.pdf}
+\end{center}
+\end{figure}
+Looking in particular at the F1-score, which is the main metric used in the project,
+the following observations can be made:
+\begin{itemize}
+    \item with the available size of training dataset there seems to be no complete ``saturation'' of performances,
+    as the scores don't seem to reach a flat ``plateau''.
+    However, the increase in performances is very slow above about 10000 training samples.
+    \item on the other hand, the number of training samples needed to achieve good perfomances is quite small:
+    with about 1500 samples the F1-score is already 85\%.
+\end{itemize}
 
+\subsection{Reflection}
+\label{sec:reflection}
+In this project the problem of detecting the so-called ``fake news'' has been studied.
+A ML algorithm has been developed which by analyzing the text of the article
+returns the result of the binary classification: fake news/real news. \\
+First, a suitable dataset of fake news and real news have been identified and downloaded.
+Then the article text in each instance has been converted to a vector of numerical features,
+representing a set of weights which take into account the frequency of the word in the document and
+in the corpus (TFIDF vectorization).
+The resulting ``word vectors'' have been feeded to 3 different ML models which are
+compared using the appropriate metrics.
+An ensemble including the best 2 classifiers is used as final model.
+
+There are several interesting aspects of this project.
+In particular the following points have been very stimulating challenges to solve.
+
+\begin{itemize}
+\item \textbf{Find the datasets} \\
+    While the idea for this project came when we stumbled upon the Kaggle fake news dataset,
+    the real news dataset has been more difficult to collect.
+    Several news website do not provide an API to fetch historical articles and most
+    of them don't provide the access to the full article.
+    Only after quite some research, we found the webhose.io dataset which fit all these criteria.
+\item \textbf{Feature extraction} \\
+    Being the first project of ``text analysis'' that I carry out,
+    I was lacking some knowledge about how to transform the text into features.
+    It took me some time to go through the different options (\textit{bag-of-words},
+    \textit{word2vec}, \textit{TFIDF}) and understand which one was the best for this case.
+\item \textbf{Model regularization} \\
+    The regularization of the random forest model has been very challenging.
+    In fact, in text analysis the number of features grows very large and a high
+    level of regularization is needed for complicated models.
+    With long training time and different combinations of parameters to validate,
+    it took quite some effort to achieve an optimal solution.
+
+\end{itemize}
+
+\subsection{Improvement}
+\label{sec:improvement}
+There is room for improvement both in the model itself and in its validation.
+Some ideas are described below: their implementation is, however, outside
+the scope of this project.
+
+Possible improvements on the algorithm side are:
+\begin{itemize}
+    \item use different, more ``complex'' models, like \textbf{deep neural networks};
+    \item analyze \textbf{n-grams}, i.e. ensemble of $n$ words;
+    \item incorporate also the \textbf{headline} of the article, together with the text;
+\end{itemize}
+
+On the validation side, the main limitation is that training/testing data belong to approximately the same time frame.
+It should be checked how the performaces change when this assumptions is relaxed.
+If the perfomances degrade, one should make sure that the model is trained on data that is relevant to
+the new instances that are being classified.
+This is not simple to handle from the technical point of view:
+one has to fetch much more data than what has been used in this project and
+probably needs to build a set of pre-trained models which cover a relevant time range.
 
 %----------------------------------------------------------------------------------------
 %	REFERENCES SECTION
