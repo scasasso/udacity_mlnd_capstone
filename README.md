@@ -2,10 +2,11 @@
 The repository is organized in files/directories:
 - `README.md`: it's this file
 - `proposal.pdf`: it's the file with the proposal for the Capstone project
-- `fake_news_detector.ipynb`: it's the Jupyter Notebook with the analysis and results
+- `report.pdf`: it's the file with the final report for the Capstone project
 - `data`: it contains the zip file with the datasets
 - `scripts`: it contains the necessary scripts to reproduce the results
-- `proposal`: it contains the files to write `proposal.pdf`
+- `proposal`: it contains the files needed to compile `proposal.pdf`  
+- `report`: it contains the files needed to compile `report.pdf`
 
 ## Instructions
 ### Build the dataset
