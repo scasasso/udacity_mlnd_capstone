@@ -31,11 +31,6 @@ clf_lr = pickle.load(open('lr_opt.pkl', 'rb'))
 clf_rndf = pickle.load(open('rndf_opt.pkl', 'rb'))
 
 # Ensemble 1
-# Scores:
-#  f1 = 0.92
-#  accuracy = 0.94
-#  precision = 0.93
-#  recall = 0.91
 print('Building EN1...')
 en1_estimators = [('mnb', clf_mnb), ('lr', clf_lr), ('rndf', clf_rndf)]
 clf_en1 = VotingClassifier(en1_estimators, voting='hard', n_jobs=-1)
@@ -47,11 +42,6 @@ pickle.dump(clf_en1, open('en1_opt.pkl', 'wb'))
 
 
 # Ensemble 2
-# Scores:
-#  f1 = 0.93
-#  accuracy = 0.95
-#  precision = 0.93
-#  recall = 0.93
 print('Building EN2...')
 en2_estimators = [('lr', clf_lr), ('rndf', clf_rndf)]
 clf_en2 = VotingClassifier(en2_estimators, voting='soft', n_jobs=-1)
