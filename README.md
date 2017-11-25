@@ -9,6 +9,14 @@ The repository is organized in files/directories:
 - `report`: it contains the files needed to compile `report.pdf`
 
 ## Instructions
+### Create the environment
+In order to create the `conda` virtual environment with all the packages needed to reproduce the result, 
+one has to run the following commands:  
+```bash
+conda env create -f environment.yml
+source activate fake-news-detector
+```
+ 
 ### Build the dataset
 The datasets are already available under the `data` directory (`data.zip`).  
 However, if you would like to reproduce it from scratch, follow the instructions below:  
