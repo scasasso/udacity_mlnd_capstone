@@ -9,3 +9,4 @@ data/*.csv
 *.aux
 *.out
 */*.pdf
+*/*.png
