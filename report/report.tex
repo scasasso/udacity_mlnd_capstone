@@ -31,6 +31,7 @@
 \usepackage{color}
 \usepackage{listings}
 \usepackage{setspace}
+\usepackage{amsmath}
 \definecolor{Code}{rgb}{0,0,0}
 \definecolor{Decorators}{rgb}{0.5,0.5,0.5}
 %\definecolor{Numbers}{rgb}{0.5,0,0}
@@ -387,18 +388,83 @@ In order to reduce the number of features, the vocabulary is built discarding th
 Another important ingredient is the ML algorithm to use for the classification.
 We decided to test 3 different algorithms in order to cover different techniques with different assumptions
 and training complexity.
-\begin{itemize}
-\item \textbf{Mulinomial Naive Bayes}. NB is frequently used in text classification,
-like spam detection, because, despite its simplicity and ``naive'' assumptions (independence of features),
-it proved to work still quite well in practice. It is also very fast to train.
-\item \textbf{Logistic Regression Classifier}. Linear classifiers are usually a good compromise between
+
+\subsubsection*{Multinomial Naive Bayes}
+Naive Bayes (NB) algorithms are frequently used in text classification,
+like spam detection, because, despite their simplistic assumptions,
+they work quite well in practice. They are also very fast to train.
+
+NB use the Bayes' theorem of probability theory assuming that features are independent (``naive'').
+This leads to the following classification rule:
+\begin{equation}
+    \label{eq:nb}
+    \hat{y} = \mathrm{arg} \max_{y} P(y) \prod_{i=1}^{n} P(x_{i} | y)
+\end{equation}
+where $n$ is the total number of features (i.e. words in the dictionary),
+$\hat{y}$ is the predicted class, $P(y)$ is the probability of class $y$ (\textit{prior probability})
+and $\prod_{i=1}^{n} P(x_{i} | y)$ is the \textit{likelihood} of the instance $(x_{1}, ..., x_{n})$
+given the hypothesis of class $y$. \\
+In Multinomial NB the likelihood of the features is a multinomial distribution for the general multi-class problem
+(in this case a binomial distribution, since there are only 2 classes).
+The parameters of the multinomial distribution are estimated on the training dataset as relative word frequencies,
+with the addition of a smoothing factor $\alpha$:
+\begin{equation}
+    \hat{\theta}_{y,i} = \dfrac{N_{y,i} + \alpha}{N_{y} + \alpha n}
+\end{equation}
+where $N_{y,i}$ is ther number of times feature $i$ appears for the class $y$ and
+$N_{y} = \sum _{i}^{n}N_{y,i}$.
+The hyper-parameter $\alpha$ avoids null probabilities and accounts for
+features not present in the training set. \\
+Once these parameters are learnt in the training, they are used to define the likelihood
+and the predicted class is the one which maximise the product in Eq. \ref{eq:nb}.
+Notice that when flat prior is specified, this is equivalent to maximise the likehood term.
+
+\subsubsection*{Logistic Regression Classifier}
+Linear classifiers are usually a good compromise between
 complexity and training time and therefore are a good benchmark to compare against more complicated algorithms.
-\item \textbf{Random Forest}. Random forests are among the most powerful predictive
-models and have a wide range of applications. The RF can potentially captures
-more complex patterns in the dataset at the prize of a longer training and higher
+
+The decision function of linear classifiers is a weighted sum of the input features plus a ``bias term'':
+\begin{equation}
+    \label{eq:linearregression}
+    y = b + \sum _{i=1} ^{n} w_{i}x_{i}
+\end{equation}
+The weight factors $w_i$ are learnt during the training step. \\
+In the case of logistic classification \cite{wiki-lr}, the output of Eq. \ref{eq:linearregression} is passed
+as argument to the \textit{logistic function}:
+\begin{equation}
+    \sigma(t) = \dfrac{1}{1 + e^{-t}}
+\end{equation}
+The output of the logistic function is a number between 0 and 1, which is interpreted as the probability of class $y$. \\
+Therefore the classification rule is:
+\begin{equation}
+    \hat{y} = \mathrm{arg} \max_{y} \sigma ( b + \sum _{i=1} ^{n} w_{i}x_{i} )
+\end{equation}
+Linear models are usually regularized by adding a penalty term to the cost function,
+which control the size of the weights (\textit{Ridge}, \textit{Lasso}, \textit{ElasticNet}, etc.).
+
+\subsubsection*{Random Forest}
+Random forests \cite{wiki-rndf} are among the most powerful predictive
+models and have a wide range of applications.
+The RF can potentially captures more complex patterns in the dataset at the prize of a longer training and higher
 parameter tuning complexity.
-\end{itemize}
-The three classifiers are finally combined in a ``voting classifier'' \cite{scikit-ensemble}.
+
+RF are ensemble of many decision trees, where the output of the classification task is
+the mode of the classes among all the classifiers.
+Each tree in the ensemble is trained on a different subset of the training set (``bagging''), in order to
+avoid correlation between the prediction of each classifier.
+In addition, at each split only a random subset of features is considered:
+this procedure further reduces possible correlations between the trees, especially in
+presence of few dominant features. \\
+The trees in the forest are usually highly regularized, in order
+to both reduce the training time and the variance of the prediction.
+This can be achieved in several different ways: by limiting the depth of the tree,
+by requiring a minimum gain at each split, etc.
+
+The three classifiers are finally combined in a \textit{voting classifier} \cite{scikit-ensemble}.
+A voting classifier is an ensemble of different classifiers, where the
+prediction is the mode of the predictions across the ensemble (``hard voting'').
+When all the classifier can estimate class probabilities, ``soft voting'' can also be used,
+which predicts the class with the highest probability across the classifiers. \\
 The \textbf{ensemble classifier} usually gives better performances (smaller variance) compared to each single classifier in the
 ensemble when there is little or none correlation across the different predictors
 (different assumptions, different training set, etc.).
@@ -414,7 +480,6 @@ Similar perfomances are expected also as a result of this project.
 %----------------------------------------------------------------------------------------
 
 \section{Methodology}
-
 
 \subsection{Data Preprocessing}
 \label{sec:preproc}
@@ -501,9 +566,21 @@ This choice is driven by the need to:
     \item regularize the trees (\texttt{max\_depth}, \texttt{min\_samples\_split})
 \end{itemize}
 
-
 The metrics described in Sec. \ref{sec:metrics} are computed using the
 implementation in the \texttt{sklearn.metrics} module \cite{scikit-metrics}.
+
+The \texttt{scikit-learn} package is remarkably well designed and documented,
+making it easy to implement the techniques discussed in this project.
+Without any particular challenge on the coding part, the main
+difficulty in the implementation was on the computing side:
+the optimisation of the parameters required a long time and
+a fair amount of resources. \\
+First, coarse grids have been used to have a rough estimate of the
+best parameter values and also to identify the most sensitive parameters.
+Secondly, a finer grid has been defined to fine-tune the parameters
+around the output of the previous step. \\
+To speed up this process, we recommend to use all the cores available (\texttt{n\_jobs=-1})
+and to save the models to file once the training is done.
 
 
 \subsection{Refinement}
